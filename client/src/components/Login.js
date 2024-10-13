@@ -14,7 +14,7 @@ function Login() {
       localStorage.setItem('token', res.data.token);
       history.push('/dashboard');
     } catch (error) {
-      console.error(error);
+      console.error('Login failed:', error.response ? error.response.data : error.message);
     }
   };
 

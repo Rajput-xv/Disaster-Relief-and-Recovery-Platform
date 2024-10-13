@@ -11,14 +11,9 @@ app.use(express.json());
 
 console.log('MongoDB URI:', process.env.MONGODB_URI); // Debugging line
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('MongoDB connection error:', err));
 
 // Define routes
 app.use('/api/auth', require('./routes/auth'));
