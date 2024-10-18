@@ -33,10 +33,12 @@ To get started with the Disaster Relief and Recovery Platform, follow these step
 ## Setting Up Environment Variables
 Create a `.env` file in the root directory of your project with the following content:
 
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+MONGODB_URI=mongodb://localhost:27017/disaster_relief_db
+JWT_SECRET=your_generated_jwt_secret_key_here
+
 
 Generate a JWT secret key using the following command in your terminal:
+```bash
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 
 Replace the placeholder values with your actual MongoDB connection string and generated JWT secret key.
