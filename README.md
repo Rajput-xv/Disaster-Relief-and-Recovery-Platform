@@ -34,6 +34,7 @@ To get started with the Disaster Relief and Recovery Platform, follow these step
 Create a `.env` file in the root directory of your project with the following content:
 
 MONGODB_URI=mongodb://localhost:27017/disaster_relief_db
+
 JWT_SECRET=your_generated_jwt_secret_key_here
 
 
