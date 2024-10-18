@@ -40,23 +40,23 @@ JWT_SECRET=your_generated_jwt_secret_key_here
 Generate a JWT secret key using the following command in your terminal:
 ```bash
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-
+```
 Replace the placeholder values with your actual MongoDB connection string and generated JWT secret key.
 
 ## Backend Setup
 Navigate to the server directory and run the following commands:
-
+```bash
 cd ./server
 npm install
 npm start
-
+```
 ## Frontend Setup
 Navigate to the client directory and run the following commands:
-
+```bash
 cd ./client
 npm install
 npm start
-
+```
 ## Running the Application
 Once both backend and frontend setups are complete, your Disaster Relief and Recovery Platform should be running and ready for use.
 
