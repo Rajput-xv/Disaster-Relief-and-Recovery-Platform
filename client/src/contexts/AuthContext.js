@@ -34,7 +34,11 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
     localStorage.setItem('token', response.data.token);
-    setUser(response.data.user);
+    const userResponse = await axios.get('http://localhost:5000/api/auth/user', {
+      headers: { Authorization: `Bearer ${response.data.token}` }
+    });
+    setUser(userResponse.data);
+    // setUser(response.data.user);
   };
 
   const logout = () => {

@@ -35,4 +35,15 @@ router.post('/:id/register', async (req, res) => {
   }
 });
 
+// Get latest events
+router.get('/latest', async (req, res) => {
+  try {
+    const events = await Event.find().sort({ date: -1 }).limit(5);
+    res.json(events);
+  } catch (error) {
+    console.error('Error fetching latest events:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

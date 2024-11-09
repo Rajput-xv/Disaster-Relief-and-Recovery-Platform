@@ -5,7 +5,7 @@ import api from '../services/api';
 
 function Dashboard() {
   const { user } = useAuth();
-  const [userStats, setUserStats] = useState({
+  const [userStats, setUserStats] = useState({ 
     eventsAttended: 0,
     resourcesContributed: 0,
     pointsEarned: 0,
@@ -16,8 +16,8 @@ function Dashboard() {
     const fetchDashboardData = async () => {
       try {
         const [statsResponse, eventsResponse] = await Promise.all([
-          api.get('/user/stats'),
-          api.get('/events/latest'),
+          api.get('/user/stat'), 
+          api.get('/events/latest'), 
         ]);
         setUserStats(statsResponse.data);
         setLatestEvents(eventsResponse.data);
@@ -32,11 +32,14 @@ function Dashboard() {
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
-        Welcome, {user?.username}!
+        Welcome, {user ? user.username : 'Guest'}!
+      </Typography>
+      <Typography variant="subtitle1" gutterBottom>
+        Role: {user ? user.role : 'N/A'}
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <Paper style={{ padding: '16px' }}>
+          <Paper style={{ padding: '20px' }}>
             <Typography variant="h6">Your Stats</Typography>
             <Typography>Events Attended: {userStats.eventsAttended}</Typography>
             <Typography>Resources Contributed: {userStats.resourcesContributed}</Typography>
