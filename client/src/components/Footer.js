@@ -1,6 +1,6 @@
 import React from 'react';
-import { Typography, Container, Link, Grid, Box } from '@material-ui/core';
-import { Email, Phone, Facebook, Twitter, Instagram } from '@material-ui/icons';
+import { Typography, Container, Link, Grid, Box } from '@mui/material';
+import { Email, Phone, Facebook, Twitter, Instagram } from '@mui/icons-material';
 
 function Footer() {
   return (

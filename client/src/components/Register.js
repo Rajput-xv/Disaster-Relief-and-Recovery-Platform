@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Box, MenuItem } from '@material-ui/core';
+import { Container, Typography, TextField, Button, Box, MenuItem } from '@mui/material';
 
 function Register() {
   const [username, setUsername] = useState('');

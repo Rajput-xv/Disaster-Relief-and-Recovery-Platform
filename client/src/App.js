@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThemeProvider, createTheme, CssBaseline } from '@material-ui/core';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';

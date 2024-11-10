@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Typography, TextField, Button, Box } from '@material-ui/core';
+import { Container, Typography, TextField, Button, Box } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 
 function Login() {

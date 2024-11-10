@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const Event = require('../models/Event');
+const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 router.post('/', async (req, res) => {
   try {
@@ -20,14 +22,17 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/:id/register', async (req, res) => {
+router.post('/:id/register', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
     if (event.registeredParticipants.length >= event.capacity) {
       return res.status(400).json({ message: 'Event is full' });
     }
-    event.registeredParticipants.push(req.body.userId);
+    if (event.registeredParticipants.some(participant => participant.equals(req.userId))) {
+      return res.status(400).json({ message: 'User already registered' });
+    }
+    event.registeredParticipants.push(req.userId);
     await event.save();
     res.json(event);
   } catch (error) {

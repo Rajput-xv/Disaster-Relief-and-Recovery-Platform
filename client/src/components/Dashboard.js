@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, Grid, Paper, Button } from '@material-ui/core';
+import { Typography, Container, Grid, Paper, Button } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 

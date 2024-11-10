@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, List, ListItem, ListItemText } from '@material-ui/core';
+import { Typography, Container, List, ListItem, ListItemText } from '@mui/material';
 import axios from 'axios';
 
 function Resources() {
