@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api'; // Use the configured Axios instance
-import { Card, CardContent, Typography, Button, Container } from '@mui/material';
+import { Typography, Container, Card, CardContent, Button } from '@mui/material';
+import api from '../services/api';
 
 const Events = () => {
   const [events, setEvents] = useState([]);

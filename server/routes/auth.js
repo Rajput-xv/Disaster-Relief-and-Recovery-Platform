@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const UserProfile = require('../models/UserProfile');
 const auth = require('../middleware/auth'); // Import the auth middleware
 
 // Register route
@@ -11,10 +12,29 @@ router.post('/register', async (req, res) => {
     if (!username || !email || !password || !role) {
       return res.status(400).json({ message: 'Username, email, password, and role are required' });
     }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ message: 'User already exists' });
+
+    // Create new user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword, role });
+    user = new User({ username, email, password: hashedPassword, role });
     await user.save();
-    res.status(201).json({ message: 'User created successfully' });
+
+    // Create user profile
+    const userProfile = new UserProfile({
+      user: user._id,
+      points: 10, // Award 10 points for registration
+      level: 1
+    });
+    await userProfile.save();
+
+    // Generate JWT token
+    const payload = { userId: user._id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(201).json({ token, message: 'User created successfully' });
   } catch (error) {
     console.error('Error during registration:', error);
     res.status(500).json({ error: error.message });

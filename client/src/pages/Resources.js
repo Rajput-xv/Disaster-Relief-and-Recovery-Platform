@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, List, ListItem, ListItemText } from '@mui/material';
+import { Typography, Container, List, ListItem, ListItemText, Button } from '@mui/material';
 import axios from 'axios';
+import DonationForm from './DonationForm';
 
 function Resources() {
   const [resources, setResources] = useState([]);
+  const [showDonationForm, setShowDonationForm] = useState(false);
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -16,6 +18,11 @@ function Resources() {
     };
     fetchResources();
   }, []);
+
+  const handleDonationSuccess = (donation) => {
+    console.log('Donation successful:', donation);
+    setShowDonationForm(false);
+  };
 
   return (
     <Container>
@@ -30,6 +37,10 @@ function Resources() {
           </ListItem>
         ))}
       </List>
+      <Button variant="contained" color="primary" onClick={() => setShowDonationForm(true)}>
+        Donate
+      </Button>
+      {showDonationForm && <DonationForm onDonationSuccess={handleDonationSuccess} />}
     </Container>
   );
 }
