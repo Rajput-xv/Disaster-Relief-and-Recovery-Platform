@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, Grid, Paper, Button, Card, CardContent } from '@mui/material';
+import { Typography, Container, Grid, Paper, Button, Card, CardContent,Box } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -11,19 +11,31 @@ function Dashboard() {
     eventsAttended: 0,
     resourcesContributed: 0,
     pointsEarned: 0,
-    level: 1
+    level: 1,
+    totalDonations: 0,
+    currency: 'USD' // Default currency
   });
   const [latestEvents, setLatestEvents] = useState([]);
+  const [donations, setDonations] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [statsResponse, eventsResponse] = await Promise.all([
+        const [statsResponse, eventsResponse, registrationsResponse, donationsResponse] = await Promise.all([
           api.get('/user/stat'), 
-          api.get('/events/latest'), 
+          api.get('/events/latest'),
+          api.get('/user/registrations'),
+          api.get('/donations')
         ]);
-        setUserStats(statsResponse.data);
+        
+        setUserStats({
+          ...statsResponse.data,
+          eventsAttended: registrationsResponse.data.length,
+          totalDonations: donationsResponse.data.reduce((total, donation) => total + donation.amount, 0),
+          currency: donationsResponse.data.length > 0 ? donationsResponse.data[0].currency : 'USD' // Set currency from donations
+        });
         setLatestEvents(eventsResponse.data.slice(0, 5)); // Limit to top 5 latest events
+        setDonations(donationsResponse.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       }
@@ -33,13 +45,16 @@ function Dashboard() {
   }, []);
 
   const handleViewDetails = (eventId) => {
-    // navigate(`/events/${eventId}`);
     navigate(`/events/`);
+  };
+
+  const handleViewForm = () => {
+    navigate(`/resources/`);
   };
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom style={{ marginTop: '20px' }}>
         Welcome, {user ? user.username : 'Guest'}!
       </Typography>
       <Typography variant="subtitle1" gutterBottom>
@@ -47,12 +62,23 @@ function Dashboard() {
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <Paper style={{ padding: '20px' }}>
+          <Paper style={{ padding: '20px', marginTop: '20px' }}>
             <Typography variant="h6">Your Stats</Typography>
             <Typography>Events Attended: {userStats.eventsAttended}</Typography>
             <Typography>Resources Contributed: {userStats.resourcesContributed}</Typography>
-            <Typography>Points Earned: {userStats.pointsEarned}</Typography>
+            <Typography>Total Donations: {userStats.currency} {userStats.totalDonations}</Typography>
+            <Typography>Points Earned: {userStats.points}</Typography>
           </Paper>
+          <Box mb={2}>
+            <Button variant="contained" color="primary" onClick={() => handleViewForm()} style={{ marginTop: '20px' }}>
+              Donate Money
+            </Button>
+          </Box>
+          <Box mb={2}>
+            <Button variant="contained" color="primary" onClick={() => handleViewForm()}>
+              Donate Resources
+            </Button>
+          </Box>
         </Grid>
         <Grid item xs={12} md={8}>
           <Paper style={{ padding: '16px' }}>
@@ -64,12 +90,12 @@ function Dashboard() {
                   <Typography variant="body2">{event.description}</Typography>
                   <Typography variant="body2">Type: {event.type}</Typography>
                   <Typography variant="body2">Date: {new Date(event.date).toLocaleDateString()}</Typography>
-                  <Typography variant="body2">Location: {event.location.coordinates.join(', ')}</Typography>
+                  <Typography variant="body2">Location: {event.location?.coordinates?.join(', ')}</Typography>
                   <Typography variant="body2">Capacity: {event.capacity}</Typography>
-                  <Typography variant="body2">Registered Participants: {event.registeredParticipants.length}</Typography>
+                  <Typography variant="body2">Registered Participants: {event.registeredParticipants?.length}</Typography>
                   <Button
                     variant="contained"
-                    style={{ backgroundColor: "#1976d2", color: "white" }} 
+                    className="view-details-button"
                     onClick={() => handleViewDetails(event._id)}
                   >
                     View Details

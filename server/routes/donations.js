@@ -1,14 +1,11 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 const Donation = require('../models/Donation');
 const User = require('../models/User'); // Assuming you have a User model
-const { recordDonationOnBlockchain } = require('../services/blockchainService');
 
 router.post('/', async (req, res) => {
   try {
     const donation = new Donation(req.body);
-    await donation.save();
-    const transactionHash = await recordDonationOnBlockchain(donation._id, donation.amount, donation.donor);
-    donation.transactionHash = transactionHash;
     await donation.save();
 
     // Update user points
@@ -20,6 +17,7 @@ router.post('/', async (req, res) => {
 
     res.status(201).json(donation);
   } catch (error) {
+    console.error('Error processing donation:', error); // Log the error
     res.status(500).json({ error: error.message });
   }
 });

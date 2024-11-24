@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Select, MenuItem } from '@mui/material';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext'; // Import the useAuth hook
 
-function DonationForm({ onDonationSuccess, currentUserId }) {
-  const [donor, setDonor] = useState('');
+function DonationForm({ onDonationSuccess }) {
+  const { user } = useAuth(); // Get the current user from the authentication context
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('INR');
   const [error, setError] = useState('');
@@ -15,36 +16,16 @@ function DonationForm({ onDonationSuccess, currentUserId }) {
     { code: 'GBP', label: 'British Pound (£)' }
   ];
 
-  const verifyUser = async (username) => {
-    try {
-      const response = await axios.get(`/api/users/verify/${username}`);
-      console.log('Verify user response:', response.data);
-      return response.data.isValid;
-    } catch (error) {
-      console.error('Error verifying user:', error);
-      return false;
-    }
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
 
     try {
-      // First verify if donor username matches current user
-      const isValidUser = await verifyUser(donor);
-
-      if (!isValidUser || donor !== currentUserId) {
-        setError('Invalid donor username or unauthorized user');
-        return;
-      }
-
-      // Proceed with donation if user is verified
+      // Proceed with donation using the current user's ID
       const response = await axios.post('/api/donations', {
-        donor,
-        amount,
-        currency,
-        userId: currentUserId
+        donor: user._id, // Use the current user's ID
+        amount: parseFloat(amount), // Ensure amount is a number
+        currency
       });
       
       onDonationSuccess(response.data);
@@ -56,21 +37,13 @@ function DonationForm({ onDonationSuccess, currentUserId }) {
 
   return (
     <Container>
-      <Typography variant="h6" sx={{ mb: 2 }}>Make a Donation</Typography>
+      <Typography variant="h6" sx={{ mb: 2 }} style={{ marginTop: '20px' }} >Make a Donation</Typography>
       {error && (
         <Typography color="error" variant="body2" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
       <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Donor/User ID"
-          value={donor}
-          onChange={(e) => setDonor(e.target.value)}
-          sx={{ mb: 2 }}
-          required
-        />
         <TextField
           fullWidth
           label="Amount"

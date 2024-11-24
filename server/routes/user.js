@@ -1,36 +1,47 @@
-const express = require('express');
-const router = express.Router();
-const mongoose = require('mongoose');
+const router = require('express').Router();
 const User = require('../models/User');
+const UserProfile = require('../models/UserProfile');
+const Event = require('../models/Event');
 const auth = require('../middleware/auth');
+const mongoose = require('mongoose');
 
-// Verify user ID
-const isValidObjectId = (id) => {
-  return mongoose.Types.ObjectId.isValid(id);
-};
-
-// User routes
-router.get('/verify/:username', auth, async (req, res) => {
+// Get user stats
+router.get('/stat', auth, async (req, res) => {
   try {
-    const { username } = req.params;
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ 
-        isValid: false,
-        message: 'User not found'
-      });
-    }
+    const userProfile = await UserProfile.findOne({ user: req.userId });
+    if (!userProfile) return res.status(404).json({ message: 'User profile not found' });
 
-    res.status(200).json({
-      isValid: true,
-      message: 'User is valid'
-    });
+    res.json(userProfile);
   } catch (error) {
-    res.status(500).json({
-      isValid: false,
-      message: 'Server error'
-    });
+    console.error('Error fetching user stats:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user info
+router.get('/', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user's registered events
+router.get('/registrations', auth, async (req, res) => {
+  try {
+    const events = await Event.find({ registeredParticipants: req.userId }).select('_id');
+    const eventIds = events.map(event => event._id);
+    res.json(eventIds);
+  } catch (error) {
+    console.error('Error fetching user registrations:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
