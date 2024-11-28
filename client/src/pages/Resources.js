@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, List, ListItem, ListItemText, Button } from '@mui/material';
+import { Typography, Container, List, Grid, ListItem, ListItemText, Button, Box } from '@mui/material';
 import axios from 'axios';
 import DonationForm from '../components/DonationForm';
 import ResourceDonationForm from '../components/DonateResourceForm';
@@ -25,6 +25,20 @@ function Resources() {
     console.log('Donation successful:', donation);
     setShowDonationForm(false);
     setShowResourceDonationForm(false);
+    // Update the resources list after a successful donation
+    setResources((prevResources) => {
+      const updatedResources = prevResources.map((resource) => {
+        if (resource.name === donation.name) {
+          return { ...resource, quantity: resource.quantity + donation.quantity };
+        }
+        return resource;
+      });
+      // If the resource is new, add it to the list
+      if (!updatedResources.some(resource => resource.name === donation.name)) {
+        updatedResources.push(donation);
+      }
+      return updatedResources;
+    });
   };
 
   const handleShowDonationForm = () => {
@@ -39,15 +53,24 @@ function Resources() {
 
   return (
     <Container>
-      <Typography variant="h4">Resources</Typography>
+      <Typography variant="h4" component="h4">Resources Available</Typography>
       <List>
         {resources.map((resource) => (
-          <ListItem key={resource._id}>
-            <ListItemText
-              primary={resource.name}
-              secondary={`Type: ${resource.type}, Quantity: ${resource.quantity}`}
-            />
-          </ListItem>
+          <Box key={resource._id} boxShadow={3} p={2} mb={2} borderRadius={4}>
+            <ListItem>
+              <ListItemText
+                primary={resource.name}
+                secondary={
+                  <>
+                    <div><Typography variant="body2" component="span">Type: {resource.type}</Typography></div>
+                    <div><Typography variant="body2" component="span">Quantity: {resource.quantity}</Typography></div>
+                    <div><Typography variant="body2" component="span">Status: {resource.status}</Typography></div>
+                    <div><Typography variant="body2" component="span">Last Updated: {new Date(resource.lastUpdated).toLocaleString()}</Typography></div>
+                  </>
+                }
+              />
+            </ListItem>
+          </Box>
         ))}
       </List>
       <Button variant="contained" color="primary" onClick={handleShowDonationForm}>

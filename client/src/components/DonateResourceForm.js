@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography, Container, Grid } from '@mui/material';
+import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography, Container } from '@mui/material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext'; // Import the useAuth hook
 
@@ -30,11 +30,8 @@ const ResourceDonationForm = ({ onDonationSuccess }) => {
     try {
       const response = await axios.post('/api/resources', {
         item: selectedItem,
-        quantity: parseInt(quantity, 10)
-      }, {
-        headers: {
-          Authorization: `Bearer ${user.token}` // Include the token in the request headers
-        }
+        quantity: parseInt(quantity, 10),
+        donor: user._id // Include the current user's ID
       });
 
       onDonationSuccess(response.data);
@@ -46,20 +43,18 @@ const ResourceDonationForm = ({ onDonationSuccess }) => {
 
   return (
     <Container>
-      <Typography variant="h6" sx={{ mb: 2 }} style={{ marginTop: '20px' }} >Make a Donation</Typography>
+      <Typography variant="h6" sx={{ mb: 2 }} style={{ marginTop: '20px' }} >Donate Resource</Typography>
       {error && (
         <Typography color="error" variant="body2" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
       <form onSubmit={handleSubmit}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="item-label">Select Item</InputLabel>
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel>Item</InputLabel>
           <Select
-            labelId="item-label"
             value={selectedItem}
             onChange={(e) => setSelectedItem(e.target.value)}
-            sx={{ mb: 2 }}
             required
           >
             {essentialItems.map((item) => (

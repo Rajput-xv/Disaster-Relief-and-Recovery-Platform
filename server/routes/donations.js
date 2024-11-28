@@ -1,7 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const Donation = require('../models/Donation');
-const User = require('../models/User'); // Assuming you have a User model
+const User = require('../models/User');
+const UserProfile = require('../models/UserProfile'); // Assuming you have a UserProfile model
+
+const updateUserLevel = async (userProfile) => {
+  const newLevel = Math.floor(userProfile.points / 100) + 1;
+  if (userProfile.level !== newLevel) {
+    userProfile.level = newLevel;
+    await userProfile.save();
+  }
+};
 
 router.post('/', async (req, res) => {
   try {
@@ -9,10 +18,14 @@ router.post('/', async (req, res) => {
     await donation.save();
 
     // Update user points
-    const user = await User.findById(donation.donor);
-    if (user) {
-      user.points += donation.amount; // Assuming 1 point per unit of currency
-      await user.save();
+    const userProfile = await UserProfile.findOne({ user: donation.donor });
+    if (userProfile) {
+      const pointsToAdd = Math.floor(donation.amount / 100) * 10; // Calculate points based on donation amount
+      userProfile.points += pointsToAdd;
+      await userProfile.save();
+      await updateUserLevel(userProfile); // Update user level based on points
+    } else {
+      console.log(`UserProfile not found for user ${donation.donor}`);
     }
 
     res.status(201).json(donation);
@@ -24,7 +37,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const donations = await Donation.find().populate('donor', 'username');
+    const donations = await Donation.find();
     res.json(donations);
   } catch (error) {
     res.status(500).json({ error: error.message });

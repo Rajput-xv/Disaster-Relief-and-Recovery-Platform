@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/User');
 const UserProfile = require('../models/UserProfile');
 const Event = require('../models/Event');
+const DonationResource = require('../models/DonationResource');
 const auth = require('../middleware/auth');
 const mongoose = require('mongoose');
 
@@ -41,6 +42,21 @@ router.get('/registrations', auth, async (req, res) => {
     res.json(eventIds);
   } catch (error) {
     console.error('Error fetching user registrations:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get total quantity of resources donated by the user
+router.get('/resources-donated', auth, async (req, res) => {
+  try {
+    const donations = await DonationResource.aggregate([
+      { $match: { donor: new mongoose.Types.ObjectId(req.userId) } },
+      { $group: { _id: null, totalQuantity: { $sum: '$quantity' } } }
+    ]);
+    const totalQuantity = donations.length > 0 ? donations[0].totalQuantity : 0;
+    res.json({ totalQuantity });
+  } catch (error) {
+    console.error('Error fetching resources donated:', error);
     res.status(500).json({ error: error.message });
   }
 });

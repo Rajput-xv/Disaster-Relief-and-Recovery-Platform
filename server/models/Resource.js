@@ -9,7 +9,7 @@ const ResourceSchema = new mongoose.Schema({
     coordinates: [Number]
   },
   status: { type: String, enum: ['available', 'in-use', 'depleted'], default: 'available' },
-  lastUpdated: { type: Date, default: Date.now }
+  lastUpdated: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Resource', ResourceSchema);

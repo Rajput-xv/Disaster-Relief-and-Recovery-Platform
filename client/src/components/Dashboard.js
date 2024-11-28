@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, Grid, Paper, Button, Card, CardContent,Box } from '@mui/material';
+import { Typography, Container, Grid, Card, CardContent, Paper, Button, Box } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -21,18 +21,20 @@ function Dashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [statsResponse, eventsResponse, registrationsResponse, donationsResponse] = await Promise.all([
+        const [statsResponse, eventsResponse, registrationsResponse, donationsResponse, resourcesResponse] = await Promise.all([
           api.get('/user/stat'), 
           api.get('/events/latest'),
           api.get('/user/registrations'),
-          api.get('/donations')
+          api.get('/donations'),
+          api.get('/user/resources-donated')
         ]);
         
         setUserStats({
           ...statsResponse.data,
           eventsAttended: registrationsResponse.data.length,
           totalDonations: donationsResponse.data.reduce((total, donation) => total + donation.amount, 0),
-          currency: donationsResponse.data.length > 0 ? donationsResponse.data[0].currency : 'USD' // Set currency from donations
+          currency: donationsResponse.data.length > 0 ? donationsResponse.data[0].currency : 'USD', // Set currency from donations
+          resourcesContributed: resourcesResponse.data.totalQuantity
         });
         setLatestEvents(eventsResponse.data.slice(0, 5)); // Limit to top 5 latest events
         setDonations(donationsResponse.data);
